@@ -1,0 +1,49 @@
+
+name: Build FireAirPlayReceiver APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Java installieren
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Android SDK einrichten
+        uses: android-actions/setup-android@v3
+
+      - name: Android SDK-Komponenten installieren
+        run: |
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "ndk;27.2.12479018" \
+            "cmake;3.22.1"
+
+      - name: Fire-TV-APK bauen
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleFiretvDebug
+
+      - name: APK veröffentlichen
+        uses: actions/upload-artifact@v4
+        with:
+          name: FireAirPlayReceiver-FireTV-APK
+          path: app/build/outputs/apk/firetv/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
