@@ -1,4 +1,3 @@
-```yaml
 name: Build Fire TV APK
 
 on:
@@ -13,9 +12,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Android APK
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,7 +22,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
 
       - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
@@ -39,8 +35,8 @@ jobs:
           test -f app/build.gradle.kts
           test -f app/src/main/AndroidManifest.xml
 
-      - name: Build debug APK
-        run: gradle --no-daemon --stacktrace assembleDebug
+      - name: Build APK
+        run: gradle --no-daemon assembleDebug
 
       - name: Verify APK
         run: test -s app/build/outputs/apk/debug/app-debug.apk
@@ -51,4 +47,3 @@ jobs:
           name: FireAirPlayReceiver-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-```
